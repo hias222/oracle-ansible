@@ -1,0 +1,43 @@
+- name: "include info"
+  ansible.builtin.include_tasks:
+    file: info.yml
+
+- name: "include base"
+  ansible.builtin.include_tasks:
+    file: base.yml
+
+#- name: "include oci"
+#  ansible.builtin.include_tasks:
+#    file: oci.yml
+
+- name: main | check if GI is installed /etc/oracle/olr.loc
+  become: true
+  stat: path=/etc/oracle/olr.loc
+  register: olrloc
+
+- name: main | debug
+  debug:
+    msg: "ASM not configured "
+  when: not olrloc.stat.exists
+
+- name: main | debug
+  debug:
+    msg: "no huge pages "
+  when: hostvars[inventory_hostname].nr_hugepages == 0
+
+- name: "include gi"
+  ansible.builtin.include_tasks:
+    file: gi.yml
+  when: not olrloc.stat.exists and not hostvars[inventory_hostname].nr_hugepages == 0
+
+- name: "check db"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell: "{{db.oracle_home}}/OPatch/opatch lsinv -oh {{db.oracle_home}}"
+  register: shell_out
+  ignore_errors: true
+
+- name: "include db"
+  ansible.builtin.include_tasks:
+    file: db.yml
+  when: not shell_out.rc == 0

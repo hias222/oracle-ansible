@@ -1,0 +1,12 @@
+- name: "main | include info"
+  ansible.builtin.include_tasks:
+    file: info.yml
+
+- name: "main | include leopard"
+  ansible.builtin.include_tasks:
+    file: leopard.yml
+  when: not fast_install|bool
+
+- name: "main | include prepare"
+  ansible.builtin.include_tasks:
+    file: prepare.yml

@@ -1,0 +1,108 @@
+- name: "db | install db "
+  become: true
+  become_user: oracle
+  ansible.builtin.debug:
+    var: ansible_facts.user_id
+
+- name: "db | copy db response file"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: software_db.rsp
+    dest: "{{ common.oracle_base }}"
+    mode: '0755'
+
+- name: "db | copy db_structure"
+  ansible.builtin.template:
+    src: root_db_structure.sh
+    dest: root_db_structure.sh
+    mode: '0755'
+
+- name: "db | create DB base"
+  ansible.builtin.shell: ./root_db_structure.sh
+  register: dboutput
+
+- name: "db | run script  root_db_structure"
+  ansible.builtin.debug:
+    var: dboutput.stdout_lines
+
+- name: "db | copy authorized keys"
+  become: true
+  become_user: oracle
+  ansible.builtin.copy:
+    src: files/authorized_keys
+    dest: "{{ grid.user_home }}/.ssh/authorized_keys"
+    mode: '0600'
+
+- name: "db | copy db_structure {{db.user_home}}"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: db_structure.sh
+    dest: "{{ db.user_home }}/db_structure.sh"
+    mode: '0755'
+
+- name: "db | create DB base run db_structure.sh"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell: "{{ db.user_home }}/db_structure.sh"
+  ignore_errors: true
+  register: dboutput
+
+- name: "db | after run script  db_structure"
+  become: true
+  become_user: oracle
+  ansible.builtin.debug:
+    var: dboutput.stdout_lines
+
+- name: "db | run orainstRoot.sh root.sh"
+  become: true
+  ansible.builtin.shell: |
+    timeout 30 /orasw/oraInventory/orainstRoot.sh
+    "timeout 30 {{ db.oracle_home }}/root.sh"
+    exit 0
+  register: dboutput
+
+- name: "db | after run root.sh"
+  become: true
+  ansible.builtin.debug:
+    var: dboutput.stdout_lines
+
+
+- name: "common | add dir /oraclearch (db creator single) "
+  become: true
+  ansible.builtin.file:
+    path: /oraclearch
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "common | add dir /oracle (db creator single) "
+  become: true
+  ansible.builtin.file:
+    path: /oracle
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "db | copy key pub"
+  become: true
+  become_user: oracle
+  ansible.builtin.copy:
+    src: files/id_rsa.pub
+    dest: "{{ common.user_home }}/.ssh/id_rsa.pub"
+    owner: oracle
+    group: oinstall
+    mode: '0600'
+
+- name: "db | copy key"
+  become: true
+  become_user: oracle
+  ansible.builtin.copy:
+    src: files/id_rsa
+    dest: "{{ common.user_home }}/.ssh/id_rsa"
+    owner: oracle
+    group: oinstall
+    mode: '0600'

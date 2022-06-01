@@ -1,0 +1,6 @@
+[DEFAULT]
+user=ocid1.user.oc1..aaaaaaaaic4wtafmn7ut3d5exb7punqyxl6z4glyvxi7sukbwpeumwni7whq
+fingerprint=70:4f:46:23:59:8e:1e:73:00:42:b5:37:7a:62:72:7f
+tenancy=ocid1.tenancy.oc1..aaaaaaaacm6va45pqbiql4lenhz43csifetjupuv5opfm7bp7fblorpn7inq
+region=eu-frankfurt-1
+key_file=~/.oci/admin26dbs.pem

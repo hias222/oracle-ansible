@@ -1,0 +1,7 @@
+- name: "info | install host "
+  ansible.builtin.debug:
+    var: ansible_facts.hostname
+
+- name: "info | huge pages "
+  ansible.builtin.debug:
+    msg: "configured {{ hostvars[inventory_hostname].nr_hugepages }} huge pages "

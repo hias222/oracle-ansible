@@ -1,0 +1,6 @@
+# exclude list 
+# past the file in the sync folder <sync_dir>
+# <sync_dir>/folders or files
+# for opda_p/tmp
+# create sync_exclude.txt as /batches/opda_p/sync_exclude.txt
+opda_p/tmp

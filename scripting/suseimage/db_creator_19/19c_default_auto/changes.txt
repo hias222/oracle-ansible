@@ -1,0 +1,5 @@
+Fehler
+
+./cr_cdb_single_asm.bash: line 993: syntax error near unexpected token `else'
+./cr_cdb_single_asm.bash: line 993: `else'
+

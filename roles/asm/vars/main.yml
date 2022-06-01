@@ -1,0 +1,9 @@
+asm:
+  template_file: grid_dg1.rsp
+  disksWithFailureGroupNames: /dev/nvme0n1,
+  diskDiscoveryString: /dev/nvm*
+  disks: /dev/nvme0n1
+  change_nvme_script: refatorNvem_to_3.sh
+grid:
+  user_home: /opt/oracle
+  oracle_home: /orasw/oracrs/product/crs19

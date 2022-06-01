@@ -1,0 +1,36 @@
+# DB-Admin referenz file
+# intern|extern:DB-Vault_Role:Name
+intern:DV_OWNER:SchorrR
+intern:DV_OWNER:SesslerM
+intern:DV_OWNER:MolkaB
+intern:DV_ACCOUNT:BrikG
+intern:DV_ACCOUNT:LiedelO
+intern:DV_ACCOUNT:LutzS003
+intern:DV_ACCOUNT:HaukI
+intern:DV_ACCOUNT:ZellerU001
+intern:DV_ACCOUNT:HegendoeJ
+intern:DV_ACCOUNT:ToschM
+intern:DV_ACCOUNT:GampertB
+intern:Basis_DBA:BonfertC001
+intern:Basis_DBA:DistlerJ
+intern:Basis_DBA:SixtB
+intern:Basis_DBA:FuchsS042
+intern:Basis_DBA:WeigandM002
+extern:Basis_DBA:CsucsT
+extern:Basis_DBA:LinckR
+extern:Basis_DBA:PaniczA002
+extern:Basis_DBA:PruschA
+extern:Basis_DBA:ReisJ
+extern:Basis_DBA:SievertK
+extern:Basis_DBA:SillerG
+extern:Basis_DBA:KretschmT004
+extern:Basis_DBA:BalthesE
+extern:Basis_DBA:AgelS001
+extern:Basis_DBA:GreinerH
+extern:Basis_DBA:SkirloJ001
+extern:Basis_DBA:AwatorL
+extern:Basis_DBA:MartinF008
+extern:Basis_DBA:PahlU001
+extern:Basis_DBA:NitschkoL
+extern:Basis_DBA:MalakanJ001
+extern:Basis_DBA:ScheererA

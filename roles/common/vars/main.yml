@@ -1,0 +1,21 @@
+common:
+  opatch_zip: p6880880_190000_Linux-x86-64.zip
+  patch_dir: /patches
+  oracle_base: /orasw/oracle
+  ba_home: /orasw/oracle/BA
+  user_home: /opt/oracle
+  dir_orabase: /orabase
+  dir_orasw: /orasw
+  oinstall_group_id: 476
+grid:
+  user_home: /opt/oracle
+  oracle_home: /orasw/oracrs/product/crs19
+  oracle_grid_zip: grid_19_9_2.zip
+  oracle_grid_ru: p32579970_190000_Linux-x86-64.zip
+db:
+  user_home: /opt/oracle
+  oracle_home: /orasw/oracle/product/db19
+  oracle_db_zip: db_19_9_2.zip
+  oracle_db_ru: p32421507_190000_Linux-x86-64.zip
+  oracle_db_ru_number: 32421507
+  db_creator_data: backup_cdb_03.tar.gz

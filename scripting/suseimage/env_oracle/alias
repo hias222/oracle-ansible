@@ -1,0 +1,62 @@
+setenv() {
+case $1 in 
+	db)
+		export ORACLE_SID=${ZELOS_SID};
+		export ORACLE_HOME=${ZELOS_DB_HOME};
+		export _O=db;
+		export DIAG_HOME=${OB}/diag/rdbms;
+	;;
+	asm)
+		export ORACLE_SID=+ASM${INO};
+		export ORACLE_HOME=$(cat /etc/oratab | grep -vE "^#|^$" | grep -E "^\+ASM|^\-MGMTDB" | cut -d: -f2 | uniq);
+		export DIAG_HOME=${OB}/diag/asm;
+		export _O=asm;
+	;;
+	agent)
+		export ORACLE_SID=${ZELOS_SID};
+		export ORACLE_HOME=/opt/oemcc/agent/agent_inst;
+		export _O=agent;
+	;;
+	*)
+		export ORACLE_SID=$1${INO};
+		export ORACLE_HOME=$(cat /etc/oratab | grep -vE "^#|^$|^\-|^\+" | grep $1 | cut -d: -f2 | uniq);
+		export DIAG_HOME=${OB}/diag/rdbms;
+		export _O=db;
+	;;
+esac
+
+export O=${ORACLE_HOME}
+export ORACLE_BASE=$(echo "${ZELOS_DB_HOME}" | cut -d/ -f-3)
+export OB=${ORACLE_BASE}
+unset PATH
+export PATH=${O}/bin:${HOME}/bin:.:${CRS_HOME}/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X/bin:/usr/dt/bin:/usr/xpg4/bin:${OB}/BA/bin:${_PATH};
+export LD_LIBRARY_PATH=$_LD_LIBRARY_PATH:/usr/local/lib:${O}/lib:${O}/lib32:${OB}/BA/lib;
+export LD_LIBRARY_PATH_64=$_LD_LIBRARY_PATH_64:${CRS_HOME}/lib:${O}/lib;
+export PS1="`uname -n`:${_O}:$ORACLE_SID: ";
+ORA_NLS33=${O}/ocommon/nls/admin/data;
+ORA_NLS10=${O}/nls/datai;
+export Z=${OB}/BA/adm;
+alias qc=${OB}/BA/bin/quickcheck.sh
+alias rn"=rlwrap rman catalog rman/geheim@$(grep ^OBR_DB $Z/bin/ZELOS_BCKP_PARAMETER | cut -d\" -f2) target /"
+}
+
+#statische aliase
+alias setcrs="setenv asm"
+alias setasm="setcrs"
+alias setdb="setenv db"
+alias setagent="setenv agent"
+alias ASM='export ORACLE_SID=+ASM${INO}'
+alias asm='export ORACLE_SID=+ASM${INO}'
+
+alias sq="rlwrap sqlplus / as sysdba"
+alias sql="rlwrap sqlplus / as sysdba"
+alias cl="clear"
+alias ll="ls -ltr"
+
+#db aliase
+echo "" > .alias_db
+for i in $(cat /etc/oratab|grep -v "^#"|cut -f1 -d: -s|grep -vE "^[+]|^[-]|^agent")
+do
+echo "alias ${i}='setenv ${i}'" >> ${HOME}/.alias_db
+done
+[ -f ${HOME}/.alias_db ] && . ${HOME}/.alias_db

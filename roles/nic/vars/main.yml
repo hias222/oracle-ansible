@@ -1,0 +1,4 @@
+common:
+  oracle_base: /orasw/oracle
+  ba_home: /orasw/oracle/BA
+  user_home: /opt/oracle

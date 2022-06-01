@@ -1,0 +1,215 @@
+- name: "common | install base "
+  ansible.builtin.debug:
+    var: ansible_facts.user_id
+
+- name: "common | copy key pub"
+  ansible.builtin.copy:
+    src: files/id_rsa.pub
+    dest: .ssh/id_rsa.pub
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.real_group_id }}"
+    mode: '0600'
+
+- name: "common | copy key"
+  ansible.builtin.copy:
+    src: files/id_rsa
+    dest: .ssh/id_rsa
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.real_group_id }}"
+    mode: '0600'
+
+- name: "common | copy authorized keys"
+  ansible.builtin.copy:
+    src: files/authorized_keys
+    dest: .ssh/authorized_keys
+    mode: '0600'
+
+- name: "common | copy base repo "
+  become: true
+  ansible.builtin.copy:
+    src: files/base.repo
+    dest: /etc/zypp/repos.d/
+    owner: "root"
+    group: "root"
+
+- name: "common | add /images "
+  become: true
+  ansible.builtin.file:
+    path: /images
+    owner: root
+    group: root
+    state: directory
+    mode: '0777'
+
+- name: "common | copy base_structure"
+  ansible.builtin.template:
+    src: base_structure.sh
+    dest: base_structure.sh
+    mode: '0755'
+
+- name: "common | create structure"
+  ansible.builtin.shell: ./base_structure.sh
+  register: baseoutput
+
+- name: "common | run script  base_structure"
+  ansible.builtin.debug:
+    var: baseoutput.stdout_lines
+
+- name: "common | add {{ common.dir_orabase }} "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.dir_orabase }}"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "common | add {{ common.dir_orasw }} "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.dir_orasw }}"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "common | add {{ common.patch_dir }} "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.patch_dir }}"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "common | copy rlwrap"
+  become: true
+  ansible.builtin.copy:
+    src: files/rlwrap-master.zip
+    dest: /root
+
+- name: "common | install rlwrap"
+  become: true
+  ansible.builtin.shell: |
+    unzip -o /root/rlwrap-master.zip -d /root
+    cd /root/rlwrap-master
+    autoreconf --install
+    autoconf
+    ./configure
+    make
+    make install
+
+- name: "common | add oracle alias"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: files/alias
+    dest: /opt/oracle/.alias
+
+- name: "common | add oracle profile"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: files/profile
+    dest: /opt/oracle/.profile
+
+- name: "common | Add IP address of all hosts to all hosts"
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_host }} {{item}}"
+    state: present
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.db }}"
+
+# shmall 31457280 (30G 8199330) echo "120 * 1024^3 / 4096" | bc
+# shmmax 64424509440 (30g 33584457728) echo "120 * 1024^3 / 2" | bc
+
+- name: "common | shmmax " 
+  become: true
+  ansible.posix.sysctl: name={{ item.name }} value={{ item.value }} 
+  with_items:
+      - { name: "kernel.shmmax", value: "64424509440" }
+      - { name: "kernel.shmall", value: "31457280" }
+      - { name: "kernel.panic_on_oops", value: "1" }
+      - { name: "fs.file-max", value: "6815744" }
+      - { name: "net.core.rmem_default", value: "262144" }
+      - { name: "net.core.rmem_max", value: "4194304" }
+      - { name: "net.core.wmem_default", value: "262144" }
+      - { name: "net.core.wmem_max", value: "1048576" }
+      - { name: "fs.aio-max-nr", value: "1048576" }
+      - { name: "vm.nr_hugepages", value: "{{ hostvars[inventory_hostname].nr_hugepages }}" }
+      - { name: "vm.hugetlb_shm_group", value: "{{ common.oinstall_group_id }}" }
+
+- name: "common | add BA_HOME {{ common.ba_home }} "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.ba_home }}"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "common | Extract ba_home.tar.gz to {{ common.ba_home }}"
+  become: true
+  become_user: oracle
+  ansible.builtin.unarchive:
+    src: files/ba_home.tar.gz
+    dest: "{{ common.ba_home }}"
+
+- name: "common | link profile_addon"
+  become: true
+  become_user: oracle
+  ansible.builtin.file:
+    dest: "{{ common.user_home }}/.profile_addon.sh"
+    src: "{{ common.ba_home }}/bin/profile_addon.sh"
+    owner: oracle
+    group: oinstall
+    state: link
+
+- name: "common | link profile_dbs"
+  become: true
+  become_user: oracle
+  ansible.builtin.file:
+    dest: "{{ common.user_home }}/.profile_dbs"
+    src: "{{ common.ba_home }}/adm/etc/profile_dbs"
+    owner: oracle
+    group: oinstall
+    force: yes
+    state: link
+
+- name: "common | Allow oinstall group to have passwordless sudo"
+  become: true
+  ansible.builtin.lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: '^%oinstall'
+      line: '%oinstall ALL=(ALL) NOPASSWD: ALL'
+      validate: visudo -cf %s
+
+- name: "common | set lang default"
+  become: true
+  become_user: oracle
+  ansible.builtin.lineinfile:
+      dest: "{{ common.user_home }}/.profile"
+      state: present
+      regexp: '^LC_ALL'
+      line: 'export LC_ALL=C.UTF-8'
+
+- name: "common | set lang default"
+  become: true
+  become_user: oracle
+  ansible.builtin.lineinfile:
+      dest: "{{ common.user_home }}/.profile"
+      state: present
+      regexp: '^LANG'
+      line: 'export LANG=C.UTF-8'
+
+- name: "common | disable firewalld"
+  become: true
+  ansible.builtin.service:
+    name: firewalld
+    enabled: no
+    state: stopped
+

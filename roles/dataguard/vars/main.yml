@@ -1,0 +1,3 @@
+common:
+  git_url: git@10.0.10.56:dataguard/dataguard.git
+  git_dest: "/opt/oracle/dataguard"

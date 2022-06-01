@@ -1,0 +1,20 @@
+- name: "main | include info"
+  ansible.builtin.include_tasks:
+    file: info.yml
+
+- name: "main | add {{ common.test_dir }}/log "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.test_dir }}/log"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "main | include prepare"
+  ansible.builtin.include_tasks:
+    file: prepare.yml
+
+- name: "main | include prepare"
+  ansible.builtin.include_tasks:
+    file: sql.yml

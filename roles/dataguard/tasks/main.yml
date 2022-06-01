@@ -1,0 +1,7 @@
+- name: "main | include info"
+  ansible.builtin.include_tasks:
+    file: info.yml
+
+- name: "main | include prepare"
+  ansible.builtin.include_tasks:
+    file: prepare.yml

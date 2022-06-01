@@ -1,0 +1,46 @@
+- name: "common | remove ocli "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/lib/oracle-cli"
+    state: absent
+
+- name: "common | remove ocli "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/install.sh"
+    state: absent
+
+- name: "common | install ocicli"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell: |
+    curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh -o {{ common.user_home }}/install.sh
+    bash {{ common.user_home }}/install.sh --accept-all-defaults
+  ignore_errors: true
+  
+- name: "common | add {{ common.user_home }}/.oci "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/.oci"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0700'
+
+- name: "common | copy admin key"
+  become: true
+  ansible.builtin.copy:
+    src: files/admin26dbs.pem
+    dest: "{{ common.user_home }}/.oci/admin26dbs.pem"
+    owner: oracle
+    group: oinstall
+    mode: '0600'
+
+- name: "common | copy config"
+  become: true
+  ansible.builtin.copy:
+    src: files/config
+    dest: "{{ common.user_home }}/.oci/config"
+    owner: oracle
+    group: oinstall
+    mode: '0600'

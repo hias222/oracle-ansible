@@ -1,0 +1,91 @@
+- name: "gi | install gi "
+  become: true
+  become_user: oracle
+  ansible.builtin.debug:
+    var: ansible_facts.user_id
+
+# groups=476(oinstall),474(dba)
+- name: "gi | add group disk"
+  become: true
+  ansible.builtin.user:
+    name: oracle
+    state: present
+    groups: oinstall,dba,disk
+
+- name: "gi | copy grid response file"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: software_grid.rsp
+    dest: "{{ common.oracle_base }}"
+    mode: '0755'
+
+- name: "gi | copy gi_structure"
+  ansible.builtin.template:
+    src: root_gi_structure.sh
+    dest: root_gi_structure.sh
+    mode: '0755'
+
+- name: "gi | create GI base start root_gi_structure.sh"
+  ansible.builtin.shell: ./root_gi_structure.sh
+  register: gioutput
+
+- name: "gi | run script  root_gi_structure"
+  ansible.builtin.debug:
+    var: gioutput.stdout_lines
+
+- name: "gi | copy authorized keys"
+  become: true
+  become_user: oracle
+  ansible.builtin.copy:
+    src: files/authorized_keys
+    dest: "{{ grid.user_home }}/.ssh/authorized_keys"
+    mode: '0600'
+
+- name: "gi | copy gi_structure {{grid.user_home}}"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: gi_structure.sh
+    dest: "{{ grid.user_home }}/gi_structure.sh"
+    mode: '0755'
+
+- name: "gi | create GI base run {{ grid.user_home }}/gi_structure.sh"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell: "{{ grid.user_home }}/gi_structure.sh"
+  ignore_errors: true
+  register: gioutput
+
+- name: "gi | output run script gi_structure"
+  become: true
+  become_user: oracle
+  ansible.builtin.debug:
+    var: gioutput.stdout_lines
+
+# gibts noch nicht abort?
+- name: "gi | run root.sh"
+  become: true
+  ansible.builtin.shell: |
+    timeout 30 /orasw/oraInventory/orainstRoot.sh
+    "timeout 30 {{ grid.oracle_home }}/root.sh"
+    exit 0
+  register: gridoutput
+  ignore_errors: true
+
+- name: "gi | run root.sh"
+  become: true
+  ansible.builtin.debug:
+    var: gridoutput.stdout_lines
+
+- name: "gi | create GI base run {{ grid.oracle_home }}/cv/rpm/cvuqdisk-1.0.10-1.rpm"
+  become: true
+  ansible.builtin.shell: "rpm -i {{ grid.oracle_home }}/cv/rpm/cvuqdisk-1.0.10-1.rpm"
+  ignore_errors: true
+
+# todo install cvuqdisk
+# Grid_home/cv/rpm
+# /orasw/oracrs/product/crs19/cv/rpm/cvuqdisk-1.0.10-1.rpm
+#rpm -i /orasw/oracrs/product/crs19/cv/rpm/cvuqdisk-1.0.10-1.rpm
+
+

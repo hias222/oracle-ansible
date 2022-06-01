@@ -1,0 +1,17 @@
+- name: "apply | copy {{asm.change_nvme_script}}"
+  become: true
+  ansible.builtin.template:
+    src:  "{{asm.change_nvme_script}}"
+    dest: "{{ grid.user_home }}/{{asm.change_nvme_script}}"
+    mode: '0755'
+
+- name: "apply | change nvme"
+  become: true
+  ansible.builtin.shell:
+    "{{ grid.user_home }}/{{asm.change_nvme_script}}"
+  register: nvmeout
+  ignore_errors: false
+
+- name: "apply | nvmeout "
+  ansible.builtin.debug:
+    var: nvmeout

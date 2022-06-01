@@ -1,0 +1,33 @@
+# Changes
+# 20.12.21 MFU IGNORE_PUBLIC_INTERFACE test für CC monitoring
+# 12.12.21 MFU EXA2ZELOS-111/113 audit und diag dest
+# 08.12.21 MFU Clone script EXA2ZELOS-117
+# 01.12.21 MFU Prpare for cloning
+# 25.11.21 MFU EXA2ZELOS114 - no password file copy to running standby
+# 24.11.21 MFU orabase anpassen im clone
+# 14.10.21 MFU standby file management EXA2ZELOS-97, new parameter -l (no listener restarts)
+# 13.10.21 MFU EXA"ZELOS-95 init broker script
+# 07.10.21 MFU EXA2ZELOS-91,-90  archivelog 2 dest enfernen, add Redo Routes with FASTSYNC
+# 22.09.21 MFU Added Monitoring User EXA2ZELOS-86
+# 14.09.21 MFU EXA2ZELOS-74 AWR Config Teil2 mehr als 2 Knoten
+# 14.09.21 MFU UMF Fehler - setzen von enabled auf primary
+# 14.09.21 MFU EXA2ZELOS-83
+# 13.09.21 MFU Add spfile for monitoring
+# 13.09.21 MFU EXA2ZELOS-78 TNS Names
+# 07.09.21 MFU EXA2ZELOS-74 AWR Config
+# 06.09.21 MFU EXA2ZELOS-62 Remove password out of dblink creation
+# 03.09.21 MFU EXA2ZELOS-77 TNS Names and generate service script
+# 31.08.21 MFU Add tns Entries for PDB, error listenr_networks quotes, correct duplicate parameter
+# 11.08.21 MFU Add servcie script and dg name in TNSNAMES
+# 10.08.21 MFU Remove Log_buffer in clone 
+# 09.08.21 MFU remove duplicate script from active, listener networks ohne TNS Names
+# 05.08.21 MFU local_listener config for CMAN and duplicate, ORACLE_HOME correct
+# 22.07.21 MFU changed sqlnet.ora, delete wallet entries Jira: EXA2ZELOS-54, error on PW copy
+# 19.07.21 MFU changes in AWR setup, changes DG3
+# 13.10.21 MFU Timing im seup duplicate
+# 07.07.21 MFU change asm user
+# 05.07.21 MFU scripte in unterverzeichnisse verschoben
+# 01.07.21 MFU Anpassungen an Clone Parametern
+# 29.06.21 MFU Anapassungen Ausgabe, UMF Passwort gleich sys
+# 28.06.21 MFU add sen+recv+SDU Sizes in HV TNS Connectstring
+# 24.06.21 MFU falsche Reihenfolge, listener networks werden erst nach tns entries gesetzt

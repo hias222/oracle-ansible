@@ -1,0 +1,5 @@
+common:
+  test_dir: "/opt/test"
+  log_dir: "/opt/test/log"
+db:
+  home: "/orasw/oracle/product/db19"

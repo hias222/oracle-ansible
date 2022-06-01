@@ -1,0 +1,64 @@
+# updated by ZELOS70
+# TEC4DB .profile for SuSE Linux
+# edited by khs,gsi,zanterr
+#
+
+EDITOR="vi"; export EDITOR
+VISUAL="vi"; export VISUAL
+PAGER="less"; export PAGER
+MAIL=/usr/mail/${LOGNAME:?}
+set -o vi 2>/dev/null
+HISTSIZE=500
+HISTFILE="$HOME/.sh_history"
+_PATH=${PATH}
+
+#rac check
+if [[ -z $(ps -ef | grep lms | grep -v grep) ]];then
+ export INO=''
+ alias cdalert='cd $DIAG_HOME/`echo ${ORACLE_SID%}|tr "[A-Z]" "[a-z]"`/$ORACLE_SID/trace/;pwd'
+else
+ export CRS_HOME=$(cat /etc/oratab | grep -vE "^#|^$" | grep -E "^\+ASM|^\-MGMTDB" | cut -d: -f2 | uniq);
+ export INO=$($CRS_HOME/bin/olsnodes -n|grep $(uname -n)|awk -F" " '{ print $2 }')
+ alias cdalert='cd $DIAG_HOME/`echo ${ORACLE_SID%?}|tr "[A-Z]" "[a-z]"`/$ORACLE_SID/trace/;pwd'
+fi
+
+export ORACLE_SID=no_sid
+# export NLS_LANG=German_germany.we8iso8859p15
+# export LC_ALL=C
+
+#Standard Zelos Umgebung
+export ZELOS_SID=no_sid
+export ZELOS_DB_HOME=/orasw/oracle/product/db19
+
+# ZELOS MOTD unterdruecken
+[ ! -f $HOME/.hushlogin ] && touch $HOME/.hushlogin
+
+#.alias auslesen
+[ -f $HOME/.alias ] && . $HOME/.alias
+setdb
+
+# NSR-Parameter
+export NSR_CLIENT=$(cat ${Z}/bin/ZELOS_BCKP_PARAMETER|grep ^NSR_CLIENT|cut -d'"' -f2)
+export NSR_COMPRESSION=FALSE
+export NSR_DATA_VOLUME_POOL=$(cat ${Z}/bin/ZELOS_BCKP_PARAMETER|grep ^NSR_DATA_VOLUME_POOL|cut -d'"' -f2)
+export NSR_LOG_VOLUME_POOL=$(cat ${Z}/bin/ZELOS_BCKP_PARAMETER|grep ^NSR_LOG_VOLUME_POOL|cut -d'"' -f2)
+export NSR_SERVER=$(cat ${Z}/bin/ZELOS_BCKP_PARAMETER|grep ^NSR_SERVER|cut -d'"' -f2)
+
+echo "# Umgebungen:   setdb setagent  setcman "
+
+echo "#######################################################################"
+echo "           Server: $(hostname -f)"
+echo "#######################################################################"
+echo ""
+#grep -i oracle /etc/oratab | grep -v "^#" |  grep -v '*' |awk -F: '{print $1}' | sort 2>/dev/null
+cat .profile_dbs | sort
+echo ""
+echo "######################################################################"
+
+echo "cdalert Sprung zum alert.log der Datenbank (Umgebung setzen)"
+# neue NLS Parameter
+#export NLS_LANG="AMERICAN_AMERICA.we8iso8859p15"
+#export LANG="de_DE.UTF-8"
+
+export NLS_DATE_FORMAT='DD.MM.YY hh24:mi:ss'
+export SQLPATH=/orabase/SQLSKRIPT/

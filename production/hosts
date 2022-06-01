@@ -1,0 +1,14 @@
+# 10.0.10.56 ansible_ssh_port=22 ansible_ssh_user='ubuntu' ansible_ssh_private_key_file='/Users/MFU/.oci/id_rsa'
+
+[db]
+l9701022 ansible_host=10.100.1.28 nr_hugepages=30000
+l9703022 ansible_host=10.100.1.111 nr_hugepages=30000
+l9702022 ansible_host=10.100.2.17 nr_hugepages=30000
+l9797022 ansible_host=10.100.1.151 nr_hugepages=0
+
+[db:vars]
+ansible_ssh_user=opc
+ansible_ssh_private_key_file=~/.oci/id_rsa
+#ansible_ssh_common_args= -J ubuntu@193.122.49.101
+ansible_ssh_common_args= -J ubuntu@193.122.49.101
+fast_install=false

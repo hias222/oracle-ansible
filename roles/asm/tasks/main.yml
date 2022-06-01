@@ -1,0 +1,11 @@
+- name: "main | include info"
+  ansible.builtin.include_tasks:
+    file: info.yml
+
+- name: "main | change nvme"
+  ansible.builtin.include_tasks:
+    file: nvme.yml
+
+#- name: "main | include apply"
+#  ansible.builtin.include_tasks:
+#    file: apply.yml

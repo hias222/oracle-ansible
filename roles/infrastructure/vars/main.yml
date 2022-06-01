@@ -1,0 +1,5 @@
+BA_COMPARTMENT_OCID: "ocid1.compartment.oc1..aaaaaaaa7mtc5654de5xklhto7dyrvvcvhdz5kz4fjxbez3a2gkn4gqv7agq"
+PYTHON_PATH_BIN: "/usr/local/bin/python3.9"
+instance_ad: "ocid1.availabilitydomain.oc1..aaaaaaaaa2artt5wizbqvwl3rgptylx2l7jqbnyv4dygcfvlrd3dphvi3mdq"
+instance_image: "ocid1.image.oc1..aaaaaaaazm4ubmss5zbw2uxwlgali22wpxkm6vlkzb7yyh6j7zanq5pz5cxq"
+instance_shape: "VM.Standard2.1"

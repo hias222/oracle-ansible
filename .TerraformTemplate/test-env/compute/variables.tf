@@ -1,0 +1,12 @@
+variable "tenancy_ocid" {}
+variable "compartment_ocid" {}
+variable "public_subnet_id" {}
+variable "private_subnet_id" {}
+variable "load_ip" {}
+variable "db_ip" {}
+variable "bastion_shape" {}
+variable "load_shape" {}
+variable "db_shape" {}
+variable "source_id" {}
+variable "authorized_keys_path" {}
+variable "ad" {}

@@ -1,0 +1,70 @@
+- name: "apply | asm host "
+  ansible.builtin.debug:
+    var: ansible_facts.hostname
+
+- name: "apply | copy db_structure {{asm.template_file}}"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src:  "{{asm.template_file}}"
+    dest: "{{ grid.user_home }}/{{asm.template_file}}"
+    mode: '0600'
+
+- name: "apply | start installer"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell:
+    "{{ grid.oracle_home }}/gridSetup.sh -responseFile {{ grid.user_home }}/{{asm.template_file}} -silent -ignorePrereqFailure"
+  args:
+    chdir: "{{ grid.oracle_home }}"
+  register: asmout
+  ignore_errors: true
+
+- name: "apply | asmout "
+  ansible.builtin.debug:
+    var: asmout
+
+- name: "apply | start root.sh"
+  become: true
+  ansible.builtin.shell:
+    "timeout 300 {{ grid.oracle_home }}/root.sh"
+  register: asmout
+
+- name: "apply | root.sh "
+  ansible.builtin.debug:
+    var: asmout
+
+- name: "apply | start executeConfigTools"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell:
+    "{{ grid.oracle_home }}/gridSetup.sh -executeConfigTools -responseFile {{ grid.user_home }}/{{asm.template_file}} -silent -ignorePrereqFailure"
+  args:
+    chdir: "{{ grid.oracle_home }}"
+  register: asmout
+  ignore_errors: true
+
+- name: "apply | executeConfigTools "
+  ansible.builtin.debug:
+    var: asmout
+
+- name: "apply | copy sql "
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src:  "addDiskgroup.sh"
+    dest: "{{ grid.user_home }}/addDiskgroup.sh"
+    mode: '0750'
+
+- name: "apply | start sql shell"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell:
+    "{{ grid.user_home }}/addDiskgroup.sh"
+  args:
+    chdir: "{{ grid.user_home }}"
+  register: asmout
+
+- name: "apply | executeConfigTools "
+  ansible.builtin.debug:
+    var: asmout.stdout_lines

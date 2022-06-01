@@ -1,0 +1,41 @@
+- name: "info | asm host "
+  ansible.builtin.debug:
+    var: ansible_facts.hostname
+
+- name: Check pre-requisites
+  debug:
+    msg: "Environment variable {{BA_COMPARTMENT_OCID}} "
+
+- name: List availbility domains
+  collections:
+    - oracle.oci
+  oracle.oci.oci_identity_availability_domain_facts:
+    compartment_id: "{{BA_COMPARTMENT_OCID}}"
+  vars:
+    ansible_python_interpreter: "{{PYTHON_PATH_BIN}}"
+  register: result
+
+- set_fact:
+    availability_domains: "{{ result.availability_domains }}"
+
+- debug:
+    msg: "{{ availability_domains }}"
+
+- name: Launch an instance
+  oracle.oci.oci_compute_instance:
+     availability_domain: "{{ instance_ad }}"
+     compartment_id: "{{ BA_COMPARTMENT_OCID }}"
+     name: "my_test_instance"
+     image_id: "{{ instance_image }}"
+     shape: "{{ instance_shape }}"
+     #  vnic:
+     #      assign_public_ip: True
+     #      hostname_label: "{{ instance_hostname }}"
+     #      subnet_id: "{{ instance_subnet_id }}"
+     metadata:
+        ssh_authorized_keys: "{{ lookup('file',  'files/authorized_keys' ) }}"
+  vars:
+    ansible_python_interpreter: "{{PYTHON_PATH_BIN}}"
+  register: result
+
+# ansible-playbook infrastructure.yml -i production/hosts

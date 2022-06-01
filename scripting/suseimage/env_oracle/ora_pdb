@@ -1,0 +1,48 @@
+#!/usr/bin/env ksh
+#
+# Voraussetzung              :  Datei $Z/etc/profile_dbs bzw. ~/.profile_dbs
+#
+# Moegliche Verwendungen:
+#      - Fktionen definieren :  . $Z/bin/tec4_helper.sh
+#      - Symlinks erzeugen   :  $Z/bin/tec4_helper.sh mkln
+#      - Symlinks ausfuehren :  $Z/../bin/{dbs|cdbs|pdbs|ora_pdb}
+#
+#############
+#
+# Log:
+# khs,20210119:  Ein paar Fctions fuer toschi
+# khs,20210120:  toschi/josef das   >>>mehrere-PDBs-in-einer-Zeile<<<    gebastelt
+# khs,20210120:  dbs(): Macke ausgebuegelt: der "grep" fand zuviel DBs
+# khs,20210120:  dbs_sorted(): 1. Version der Sortierung der PDBs pro CDB ueber die Hilfsfunktionen
+# khs,20210120:  profile_dbs() kann jetzt sortieren + auch >>>mehrere-PDBs-in-einer-Zeile<<<
+# khs,20210121:  pdbs() Macke beim finalen print korrigiert
+# khs,20210127:  geschlossene, aber lt. oratab existierende, DBs kriegen die PDB "OFFLINE_or_FAILURE"
+# khs,20210128:  der Aufruf "h=3 dbs" ist aequivalent zum "profile_dbs()" fuer Toschi in der .profile
+#
+#############
+
+ME=$(basename -- $0 .sh)
+ORACLE_ABSE=${ORACLE_BASE:=/orasw/oracle}
+Z=${Z:=$ORACLE_BASE/BA/adm}
+profile_dbs=$Z/etc/profile_dbs
+
+echo $PATH | grep -q /BA/bin || PATH=$PATH:.:$ORACLE_BASE/BA/bin:$Z/bin
+
+
+dbs(){ l=$(cat $profile_dbs|sort|sed -e 's|PDBS:|:|' -e 's| or |_or_|');p="$*";for j in ${p:="."}; do echo "$l"|grep "^CDB:.*$j"|awk -F: -v h=${h:=1} '{ printf("%s:\t%s",$1,$2);split($NF,a," ");for(i=1;i<=asort(a);++i){(i%h==1||h==1)?n="\n\t\t":n=" ";printf("%s%s",n,a[i]);};printf("\n");}';done; }
+#
+pdbs(){ dbs $* | grep -v '^CDB:' | awk '{ for(i=1;i<NF;++i) printf("%s ",$i);print $i; }' | sort -u; }
+#
+cdbs(){ dbs $* | grep '^CDB:' | awk '{ print $2; }'; }
+#
+ora_pdb() { for i in $(cdbs);do for j in $(pdbs $i);do echo "$i:$j";done;done >$Z/etc/ora_pdb; }
+
+
+_FUNCS="dbs pdbs cdbs ora_pdb"
+for i in $_FUNCS; do test $ME = $i && { $ME $*; exit $?; }; done
+#
+test "$ME$1" = tec4_helpermkln && for i in $_FUNCS; do rm -f $Z/../bin/$i $Z/bin/$i; ln -s $Z/bin/$ME.sh $Z/../bin/$i; done
+
+return 2>/dev/null
+exit
+

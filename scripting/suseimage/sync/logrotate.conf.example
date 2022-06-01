@@ -1,0 +1,8 @@
+/orasw/oracle/BA/adm/log/sync_p/l* {
+    daily
+    missingok
+    rotate 9999
+    maxage 15
+    dateext
+}
+

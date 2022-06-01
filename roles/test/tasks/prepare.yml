@@ -1,0 +1,16 @@
+- name: "test | add {{ common.test_dir }} "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.test_dir }}"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "test | copy onessd.sh "
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: onessd.sh
+    dest: "{{ common.test_dir }}/onessd.sh"
+    mode: '0755'

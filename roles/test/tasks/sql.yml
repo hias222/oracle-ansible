@@ -1,0 +1,48 @@
+- name: "test | add {{ common.test_dir }}/sql "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.test_dir }}/sql"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "test | var" 
+  ansible.builtin.set_fact:
+    test_script: "iocalibrate.sql"
+
+- name: "test | copy {{test_script}} "
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: "{{test_script}}"
+    dest: "{{ common.test_dir }}/sql/{{test_script}}"
+    mode: '0755'
+
+- name: "test | copy startSql "
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: "startSql.sh"
+    dest: "{{ common.test_dir }}/sql/start_{{test_script}}.sh"
+    mode: '0755'
+
+- name: "test | var" 
+  ansible.builtin.set_fact:
+    test_script: "leopard.sql"
+
+- name: "test | copy {{test_script}} "
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: "{{test_script}}"
+    dest: "{{ common.test_dir }}/sql/{{test_script}}"
+    mode: '0755'
+    
+- name: "test | copy startSql "
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: "startSql.sh"
+    dest: "{{ common.test_dir }}/sql/start_{{test_script}}.sh"
+    mode: '0755'

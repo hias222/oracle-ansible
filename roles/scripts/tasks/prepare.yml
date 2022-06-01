@@ -1,0 +1,110 @@
+- name: "scripts | remove dir {{ common.user_home }}/db_creator_19 "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/db_creator_19"
+    state: absent
+  when: not fast_install|bool
+
+- name: "scripts | add dir {{ common.user_home }}/db_creator_19/19c_default_auto/resources"
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/db_creator_19/19c_default_auto/resources"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "scripts | Extract db_creator_19.tar.gz to {{ common.user_home }}/db_creator_19"
+  become: true
+  become_user: oracle
+  ansible.builtin.unarchive:
+    src: files/db_creator_19.tar.gz
+    dest: "{{ common.user_home }}/db_creator_19"
+
+- name: "DG_TOOLS | remove dir {{ common.user_home }}/dg_tools "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/dg_tools"
+    state: absent
+  when: not fast_install|bool
+
+- name: "DG_TOOLS | add dir {{ common.user_home }}/dg_tools"
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/dg_tools"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "DG_TOOLS | Extract sync.tar.gz to {{ common.user_home }}/dg_tools"
+  become: true
+  become_user: oracle
+  ansible.builtin.unarchive:
+    src: files/sync.tar.gz
+    dest: "{{ common.user_home }}/dg_tools"
+
+- name: "scripts | copy ssh_copy.sh"
+  ansible.builtin.template:
+    src: ssh_copy.sh
+    dest: ssh_copy.sh
+    mode: '0755'
+  when: not fast_install|bool
+
+- name: "scripts | run "
+  ansible.builtin.shell: "./ssh_copy.sh {{ db.db_creator_data }}"
+  register: dboutput
+  when: not fast_install|bool
+
+- name: "scripts | run script  ssh_copy.sh"
+  ansible.builtin.debug:
+    var: dboutput.stdout_lines
+  when: not fast_install|bool
+
+- name: "db | Extract {{ db.db_creator_data }} to {{ common.user_home }}/db_creator_19/19c_default_auto/resources"
+  become: true
+  become_user: oracle
+  ansible.builtin.unarchive:
+    src: "/images/{{ db.db_creator_data }}"
+    dest: "{{ common.user_home }}/db_creator_19/19c_default_auto/resources"
+    remote_src: yes
+  when: not fast_install|bool
+
+- name: "db | copy change_db_creator to {{ common.user_home }}/db_creator_19/19c_default_auto"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: change_db_creator.sh
+    dest: "{{ common.user_home }}/db_creator_19/19c_default_auto/change_db_creator.sh"
+    mode: '0755'
+
+- name: "db | run change_db_creator.sh"
+  become: true
+  become_user: oracle
+  ansible.builtin.shell: 
+   cmd: "{{ common.user_home }}/db_creator_19/19c_default_auto/change_db_creator.sh"
+   chdir: "{{ common.user_home }}/db_creator_19/19c_default_auto"
+  register: dbcoutput
+
+- name: "db | dbcoutput"
+  become: true
+  ansible.builtin.debug:
+    var: dbcoutput.stdout_lines
+
+- name: "db | Add IP address of all hosts to all hosts"
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_host }} {{item}}"
+    state: present
+  when: hostvars[item].ansible_host is defined
+  with_items: "{{ groups.db }}"
+
+- name: "db | delete rman"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: delete_archive.sh
+    dest: "{{ common.user_home }}"
+    mode: '0755'

@@ -1,0 +1,25 @@
+- name: "nic | add dir {{ common.user_home }}/nic"
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/nic"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "nic | copy secondary_vnic_all_configure.sh"
+  become: true
+  become_user: oracle
+  ansible.builtin.copy:
+    src: files/secondary_vnic_all_configure.sh
+    dest: "{{ common.user_home }}/nic/secondary_vnic_all_configure.sh"
+    mode: '0755'
+
+- name: "nic | run"
+  become: true
+  ansible.builtin.shell: "{{ common.user_home }}/nic/secondary_vnic_all_configure.sh -c"
+  register: shresult
+
+- name: "nic | output"
+  ansible.builtin.debug:
+    msg: "{{ shresult }}"

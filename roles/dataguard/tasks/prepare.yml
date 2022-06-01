@@ -1,0 +1,17 @@
+- name: "common | add {{ common.git_dest}} "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.git_dest}}"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "prepare"
+  become: true
+  become_user: oracle
+  ansible.builtin.git:
+    repo: "{{ common.git_url}}"
+    dest: "{{ common.git_dest}}"
+    accept_hostkey: yes
+    force: yes

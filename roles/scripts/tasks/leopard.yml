@@ -1,0 +1,23 @@
+- name: "leopard | add leopard "
+  become: true
+  ansible.builtin.file:
+    path: "{{ common.user_home }}/leopard"
+    owner: oracle
+    group: oinstall
+    state: directory
+    mode: '0755'
+
+- name: "leopard | Extract leopard.tar.gz to {{ common.user_home }}/leopard"
+  become: true
+  become_user: oracle
+  ansible.builtin.unarchive:
+    src: "/Users/MFU/projects/work/ba/leopard.tar.gz"
+    dest: "{{ common.user_home }}/leopard"
+
+- name: "leopard | copy start script leopard"
+  become: true
+  become_user: oracle
+  ansible.builtin.template:
+    src: leopard.sh
+    dest: "{{ common.user_home }}/leopard.sh"
+    mode: '0755'

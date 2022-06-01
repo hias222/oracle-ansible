@@ -1,0 +1,9 @@
+common:
+  oracle_base: /orasw/oracle
+  ba_home: /orasw/oracle/BA
+  user_home: /opt/oracle
+  log_dir: /opt/oracle/log
+db:
+  user_home: /opt/oracle
+  db_creator_data: backup_cdb_03.tar.gz
+  oracle_home: /orasw/oracle/product/db19
